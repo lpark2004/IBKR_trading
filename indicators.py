@@ -48,8 +48,9 @@ def weighted_momentum(list, period, grouping = 5):
             return 0
     
     thelist.reverse()
-    subList = [thelist[n:n+c] for n in range(0, len(thelist), grouping)]
+    subList = [thelist[n:n+grouping] for n in range(0, len(thelist), grouping)]
     for i in range(1, len(subList)+1):
         momentumvalue = momentumvalue + i*sum(subList[i-1])
     return momentumvalue
 
+print("Hello world")
