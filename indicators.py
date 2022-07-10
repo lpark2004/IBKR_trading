@@ -52,5 +52,3 @@ def weighted_momentum(list, period, grouping = 5):
     for i in range(1, len(subList)+1):
         momentumvalue = momentumvalue + i*sum(subList[i-1])
     return momentumvalue
-
-print("Hello world")
