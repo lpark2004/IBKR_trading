@@ -3,7 +3,8 @@ Has the functions necessary to start communication with the api
 """
 
 from ibapi.client import EClient
-from ibapi.wrapper import EWrapper  
+from ibapi.wrapper import EWrapper
+
 
 class IBapi(EWrapper, EClient):
      def __init__(self):
