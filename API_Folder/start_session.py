@@ -5,6 +5,8 @@ Has the functions necessary to start communication with the api
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
 from ibapi.contract import Contract
+from ibapi.ticktype import TickTypeEnum
+
 
 import threading
 import time
@@ -21,7 +23,7 @@ def run_loop():
 	app.run()
 
 app = IBapi()
-app.connect('127.0.0.1', 4001, 1)
+app.connect('127.0.0.1', 7946, 1)
 
 #Start the socket in a thread
 api_thread = threading.Thread(target=run_loop, daemon=True)
@@ -37,7 +39,10 @@ apple_contract.exchange = 'SMART'
 apple_contract.currency = 'USD'
 
 #Request Market Data
-app.reqMktData(1, apple_contract, '', False, False, [])
+app.reqMarketDataType(4)
+
+
+app.reqMktData(1, apple_contract, TickTypeEnum.to_str(100), False, False, [])
 
 time.sleep(10) #Sleep interval to allow time for incoming price data
 app.disconnect()
