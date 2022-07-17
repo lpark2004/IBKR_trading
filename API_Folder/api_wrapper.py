@@ -11,6 +11,7 @@ import queue
 import datetime
 import time
 import math
+import order_wrapper as o_wrap
 
 '''
 How communication with IBKR API is established
@@ -69,6 +70,18 @@ class TestWrapper(EWrapper):
         ## Overriden method
         self.my_time_queue.put(server_time)
 
+    #ID handling methods
+    #Gets teh next valid ID from TWS
+    def nextValidId(self, orderId: int):
+        super().nextValidId(orderId)
+        logging.debug("setting nextValidOrderId: %d", orderId)
+        self.nextValidOrderId = orderId
+
+    def nextOrderId(self):
+        oid = self.nextValidOrderId
+        self.nextValidOrderId += 1
+        return oid
+
 #TestClient is used by the API to send messages to the server
 #In this class we do not override methods
 #Test Client is just used to invoke messagesa nd requests
@@ -109,23 +122,38 @@ class TestClient(EClient):
 #TestApp class is where we establish environmental variables
 #Primarily used to implement the TestWrapper and TestClient classes
 #and begins the server connection
-class TestApp (TestWrapper, TestClient):
-    #Initializes our main classes
-    def __init__(self, ipaddress, portid, clientid):
-        TestWrapper.__init__(self)
-        TestClient.__init__(self, wrapper = self)
+class TestApp(TestWrapper, TestClient):
+ #Intializes our main classes
+ def __init__(self, ipaddress, portid, clientid):
+    TestWrapper.__init__(self)
+    TestClient.__init__(self, wrapper=self) 
 
-        #Connects to the server with the ipaddress, portid, and clientId specified in
-        #the program execution area
-        self.connect(ipaddress, portid, clientid)
+    #Connects to the server with the ipaddress, portid, and clientId specified in
+    #the program execution area
+    self.connect(ipaddress, portid, clientid)
 
-        #Initializes the threading
-        thread = Thread(target = self.run)
-        thread.start()
-        setattr(self, "_thread", thread)
+    #Initializes the threading
+    thread = Thread(target = self.run)
+    thread.start()
+    setattr(self, "_thread", thread)
 
-        #Starts listening for errors
-        self.init_error()
+    #Starts listening for errors
+    self.init_error() 
+
+#Testing order methods from order_wrapper
+def orderExecution():
+
+    #Places the order with the returned contract and order objects
+    contractObject = o_wrap.contractCreate("AAPL", "STK", "SMART")
+    orderObject = o_wrap.orderCreate("BUY", "MKT", 10)
+    nextID = app.nextOrderId()
+
+    #Print statement to confirm correct values
+    print("The next valid id is - " + str(nextID))
+
+    #Place order
+    app.placeOrder(nextID, contractObject, orderObject)
+    print("Order Was Placed")
 
 
 if __name__ == '__main__':
@@ -135,6 +163,7 @@ if __name__ == '__main__':
     # Specifies that we are on local host with port 7497 (paper trading port number)
     app = TestApp("127.0.0.1", 7497, 0)
  
+    
     # A printout to show the program began
     print("The program has begun")
  
@@ -143,4 +172,10 @@ if __name__ == '__main__':
  
     #printing the return from the server
     print("This is the current time from the server " )
-    print(requested_time) 
+    print(requested_time)     
+    
+#give everything a couple of seconds to process things or else API might fritz out
+time.sleep(3)
+#experimenting with multiple orders
+for x in range(3):
+    orderExecution()
