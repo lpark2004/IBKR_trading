@@ -9,6 +9,13 @@ period is how many elements should be considered in the calculation
 this function also does not consider values that = 0
 used in impulse calculation
 """
+def vel_list(list):
+    vel_list = [0]
+    for ind in range(len(list) - 1):
+        vel_list.append((list[ind + 1] - list[ind]) / list[ind])
+
+    return vel_list
+
 def simple_momentum(list, period):
     simple_momentum = 0
     count = 1
@@ -38,6 +45,7 @@ def weighted_momentum(list, period, grouping = 5):
     momentumvalue = 0
     count = 0
     thelist = []
+
 
     while len(thelist) < period:
         if count < len(list):
